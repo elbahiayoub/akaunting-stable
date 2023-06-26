@@ -1,0 +1,78 @@
+name: Akaunting Deployment
+
+on:
+  #push:
+    #branches:
+      #- main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install PHP and Extensions
+        run: |
+          sudo apt update
+          sudo apt install lsb-release ca-certificates apt-transport-https software-properties-common -y
+          sudo add-apt-repository ppa:ondrej/php -y
+          sudo apt install php8.2 -y
+          sudo apt install php8.2-{bcmath,xml,fpm,mysql,zip,intl,ldap,gd,cli,bz2,curl,mbstring,pgsql,opcache,soap,cgi} -y
+          php --version
+          sudo apt install git
+      - name: Install MariaDB Database server
+        run: |
+          sudo apt install mariadb-server mariadb-client -y
+          sudo mysql -u root -e "CREATE DATABASE akaunting;"
+          sudo mysql -u root -e "GRANT ALL PRIVILEGES ON akaunting.* TO 'akaunting'@'localhost' IDENTIFIED BY 'StrongPassword';"
+          sudo mysql -u root -e "FLUSH PRIVILEGES;"
+      - name: Download Akaunting software on Ubuntu
+        run: |
+          sudo git clone https://github.com/elbahiayoub/akaunting-stable.git
+          sudo mv akaunting-stable /var/www/
+      - name: Install Nginx and initialize Akaunting
+        run: |
+          sudo apt remove apache2 -y
+          sudo apt install nginx -y
+          sudo chown -R www-data:www-data /var/www/akaunting
+          sudo tee /etc/nginx/conf.d/akaunting.conf > /dev/null <<EOF
+          server {
+             listen 80;
+             server_name localhost;
+             access_log  /var/log/nginx/akaunting_access.log;
+             error_log   /var/log/nginx/akaunting_error.log;
+             root  /var/www/akaunting;
+             index  index.php index.html;
+             location / {
+                       try_files \$uri /index.php;
+             }
+             location ~ \.php$ {
+                      try_files \$uri =404;
+                      fastcgi_split_path_info ^(.+\.php)(/.*)$;
+                      fastcgi_pass unix:/var/run/php/php-fpm.sock;
+                      fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+                      fastcgi_index index.php;
+                      include fastcgi_params;
+             }
+             location ~ /\. {
+                       return 404;
+             }
+             location ~ (?:composer.json|composer.lock|bower.json)$ {
+                       return 404;
+             }
+          }
+          EOF
+          sudo nginx -t
+          sudo systemctl restart nginx php8.2-fpm.service
+      - name: Test site
+        run: |
+          status_code=$(curl -s -o /dev/null -w "%{http_code}" -L http://localhost)
+          if [[ "$status_code" == "200" ]]; then
+            echo "Site is working correctly"
+            curl -s http://localhost
+          else
+            echo "Site is not working correctly, received status code: $status_code"
+          fi
