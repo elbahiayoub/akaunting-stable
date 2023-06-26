@@ -32,7 +32,8 @@ jobs:
       - name: Download Akaunting software on Ubuntu
         run: |
           sudo git clone https://github.com/elbahiayoub/akaunting-stable.git
-          sudo mv akaunting-stable /var/www/
+          sudo mv akaunting-stable akaunting
+          sudo mv akaunting /var/www
       - name: Install Nginx and initialize Akaunting
         run: |
           sudo apt remove apache2 -y
