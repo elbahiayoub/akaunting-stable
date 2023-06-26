@@ -73,7 +73,18 @@ jobs:
           status_code=$(curl -s -o /dev/null -w "%{http_code}" -L http://localhost)
           if [[ "$status_code" == "200" ]]; then
             echo "Site is working correctly"
-            curl -s http://localhost
+            html_content=$(curl -s http://localhost)
+            echo "$html_content" > redirected_page.html
+            echo "::set-output name=html_content::$html_content"
           else
             echo "Site is not working correctly, received status code: $status_code"
           fi
+        
+        
+      - name: Publish artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: redirected-page
+          path: ${{ env.REDIRECTED_PAGE }}
+
+     
