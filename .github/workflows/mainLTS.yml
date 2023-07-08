@@ -42,24 +42,20 @@ jobs:
           sudo tee /etc/apache2/sites-available/akaunting.conf > /dev/null <<EOF
           <VirtualHost *:80>
             ServerName localhost
-            DocumentRoot /var/www/akaunting
+            DocumentRoot /var/www/html/public
 
-            ErrorLog \${APACHE_LOG_DIR}/akaunting_error.log
-            CustomLog \${APACHE_LOG_DIR}/akaunting_access.log combined
-
-            <Directory /var/www/akaunting>
-              Options Indexes FollowSymLinks
+            <Directory /var/www/html/public>
+              Options Indexes FollowSymLinks MultiViews
               AllowOverride All
-              Require all granted
+              Order allow,deny
+              allow from all
             </Directory>
 
-            <FilesMatch \.php$>
-              SetHandler proxy:unix:/var/run/php/php-fpm.sock|fcgi://localhost/
-            </FilesMatch>
-
+            ErrorLog ${APACHE_LOG_DIR}/error.log
+            CustomLog ${APACHE_LOG_DIR}/access.log combined
           </VirtualHost>
           EOF
-          sudo a2ensite akaunting
+          sudo a2ensite akaunting.conf
           sudo a2enmod proxy_fcgi
           sudo systemctl restart apache2
 
