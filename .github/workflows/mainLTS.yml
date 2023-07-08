@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo apt remove nginx -y
           sudo apt install apache2 -y
-          sudo chown -R www-data:www-data /var/www/html/akaunting
+          sudo chown -R www-data:www-data /var/www/html/akaunting/public
           sudo tee /etc/apache2/sites-available/akaunting.conf > /dev/null <<EOF
           <VirtualHost *:80>
             ServerName localhost
