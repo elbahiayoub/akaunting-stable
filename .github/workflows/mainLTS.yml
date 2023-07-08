@@ -3,7 +3,7 @@ name: Akaunting Deployment
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
@@ -79,7 +79,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
+          tag_name: ${{ github.ref.replace('refs/heads/', '') }}
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
