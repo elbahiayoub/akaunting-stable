@@ -42,9 +42,9 @@ jobs:
           sudo tee /etc/apache2/sites-available/akaunting.conf > /dev/null <<EOF
           <VirtualHost *:80>
             ServerName localhost
-            DocumentRoot /var/www/html/public
+            DocumentRoot /var/www/
 
-            <Directory /var/www/html/public>
+            <Directory /var/www>
               Options Indexes FollowSymLinks MultiViews
               AllowOverride All
               Order allow,deny
