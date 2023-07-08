@@ -43,19 +43,17 @@ jobs:
           <VirtualHost *:80>
             ServerName localhost
             DocumentRoot /var/www/html/akaunting/public
-
             <Directory /var/www/html/akaunting/public>
               Options Indexes FollowSymLinks MultiViews
               AllowOverride All
-              Order allow,deny
-              allow from all
+              Require all granted
             </Directory>
-
             ErrorLog ${APACHE_LOG_DIR}/error.log
             CustomLog ${APACHE_LOG_DIR}/access.log combined
           </VirtualHost>
           EOF
           sudo a2ensite akaunting.conf
+          sudo a2enmod rewrite
           sudo a2enmod proxy_fcgi
           sudo systemctl restart apache2
           sudo systemctl reload apache2
