@@ -64,7 +64,8 @@ jobs:
           if [[ "$status_code" == "200" ]]; then
             echo "Site is working correctly"
             html_content=$(curl -s http://localhost/install/requirements)
-            echo "$html_content"
+            html_content1=$(curl -s http://localhost)
+            echo "$html_content1"
            
           else
             echo "Site is not working correctly, received status code: $status_code"
