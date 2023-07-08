@@ -1,9 +1,9 @@
 name: Akaunting Deployment
 
 on:
-  push:
-    branches:
-      - master
+  #push:
+    #branches:
+      #- master
   workflow_dispatch:
 
 jobs:
@@ -72,6 +72,19 @@ jobs:
             html_content2=$(curl -s http://localhost)
             echo "$html_content2"
           fi
+          
+      - name: Calculate next version
+        id: calculate_next_version
+        run: |
+          latestRelease=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest)
+          lastVersion=$(echo "$latestRelease" | jq -r '.name' | sed 's/[^0-9.]*//g')
+          IFS='.' read -r -a versionArray <<< "$lastVersion"
+          patchVersion=$((versionArray[2]+1))
+          nextVersion="${versionArray[0]}.${versionArray[1]}.$patchVersion"
+          echo "::set-output name=next_version::$nextVersion"
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -79,11 +92,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          tag_name: v1.0.1
-          release_name: Release v1.0.1
+          tag_name: ${{ steps.calculate_next_version.outputs.next_version }}
+          release_name: Release ${{ steps.calculate_next_version.outputs.next_version }}
           draft: false
           prerelease: false
-          
           
       - name: Publish Artifact
         uses: actions/upload-artifact@v2
