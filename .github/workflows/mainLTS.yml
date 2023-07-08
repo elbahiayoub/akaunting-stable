@@ -33,7 +33,7 @@ jobs:
         run: |
           sudo git clone https://github.com/elbahiayoub/akaunting-stable.git
           sudo mv akaunting-stable akaunting
-          sudo mv akaunting /var/www/html
+          sudo mv akaunting /var/www/html/
       - name: Install Apache and initialize Akaunting
         run: |
           sudo apt remove nginx -y
@@ -42,9 +42,9 @@ jobs:
           sudo tee /etc/apache2/sites-available/akaunting.conf > /dev/null <<EOF
           <VirtualHost *:80>
             ServerName localhost
-            DocumentRoot /var/www/html/public
+            DocumentRoot /var/www/html/akaunting/public
 
-            <Directory /var/www/html/public>
+            <Directory /var/www/html/akaunting/public>
               Options Indexes FollowSymLinks MultiViews
               AllowOverride All
               Order allow,deny
