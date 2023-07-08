@@ -44,7 +44,7 @@ jobs:
             ServerName localhost
             DocumentRoot /var/www/html/akaunting/public
             <Directory /var/www/html/akaunting/public>
-              Options Indexes FollowSymLinks MultiViews
+              Options FollowSymLinks MultiViews
               AllowOverride All
               Require all granted
             </Directory>
