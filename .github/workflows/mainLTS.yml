@@ -58,6 +58,7 @@ jobs:
           sudo a2ensite akaunting.conf
           sudo a2enmod proxy_fcgi
           sudo systemctl restart apache2
+          sudo systemctl reload apache2
 
       - name: Test site
         run: |
